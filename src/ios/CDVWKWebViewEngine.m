@@ -323,6 +323,48 @@ static void * KVOContext = &KVOContext;
     return _engineWebView;
 }
 
+- (void)webView:(WKWebView*)webView didFinishNavigation:(WKNavigation*)navigation
+{
+        //取出cookie
+        NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        //js函数
+        NSString *JSFuncString =
+        @"function setCookie(name,value,expires)\
+        {\
+        var oDate=new Date();\
+        oDate.setDate(oDate.getDate()+expires);\
+        document.cookie=name+'='+value+';expires='+oDate+';path=/'\
+        }\
+        function getCookie(name)\
+        {\
+        var arr = document.cookie.match(new RegExp('(^| )'+name+'=({FNXX==XXFN}*)(;|$)'));\
+        if(arr != null) return unescape(arr[2]); return null;\
+        }\
+        function delCookie(name)\
+        {\
+        var exp = new Date();\
+        exp.setTime(exp.getTime() - 1);\
+        var cval=getCookie(name);\
+        if(cval!=null) document.cookie= name + '='+cval+';expires='+exp.toGMTString();\
+        }";
+
+        //拼凑js字符串
+        NSMutableString *JSCookieString = JSFuncString.mutableCopy;
+        for (NSHTTPCookie *cookie in cookieStorage.cookies) {
+            NSString *excuteJSString = [NSString stringWithFormat:@"setCookie('%@', '%@', 1);", cookie.name, cookie.value];
+            [JSCookieString appendString:excuteJSString];
+        }
+        //执行js
+        [webView evaluateJavaScript:JSCookieString completionHandler:^(id obj, NSError * _Nullable error) {
+            NSLog(@"%@",error);
+        }];
+
+        CDVViewController* vc = (CDVViewController*)self.viewController;
+        [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
+
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
+}
+
 - (UIView*)webView
 {
     return self.engineWebView;
