@@ -413,13 +413,13 @@ static void * KVOContext = &KVOContext;
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginResetNotification object:webView]];
 }
 
-- (void)webView:(WKWebView*)webView didFinishNavigation:(WKNavigation*)navigation
-{
-    CDVViewController* vc = (CDVViewController*)self.viewController;
-    [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
-
-    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
-}
+//- (void)webView:(WKWebView*)webView didFinishNavigation:(WKNavigation*)navigation
+//{
+//    CDVViewController* vc = (CDVViewController*)self.viewController;
+//    [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
+//
+//    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
+//}
 
 - (void)webView:(WKWebView*)theWebView didFailProvisionalNavigation:(WKNavigation*)navigation withError:(NSError*)error
 {
