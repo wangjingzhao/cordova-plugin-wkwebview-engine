@@ -35,8 +35,37 @@ var WkWebKit = {
         exec(successCallback, errorCallback, "CDVWKWebViewEngine",
             "setCookie", [domain, path, name ? name : "foo", value ? value : "bar"]);
     },
+    getCookie:function()
+    {
+        var arr = document.cookie.split(';');
+        var cookieArr = [];
+        for(var i=0;i<arr.length;i++)
+        {
+            var key=arr[i].split('=')[0];
+            var val=arr[i].split('=')[1];
+            if(key!=="")
+            {
+                cookieArr.push({key:key,value:val});
+            }
+
+        }
+        return cookieArr;
+    },
     injectCookie: function (url, successCallback, errorCallback) {
-        this.setCookie(url, "foo", "bar", successCallback, errorCallback);
+        var cookies=this.getCookie();
+        for(cookie in cookies)
+        {
+            if(cookies[cookie]["key"] !== undefined ||cookies[cookie]["key"] !== "")
+            {
+                this.setCookie(url, cookies[cookie]["key"], cookies[cookie]["value"], successCallback, errorCallback);
+            }
+            else
+            {
+                console.log("undefined");
+            }
+
+        }
+        //this.setCookie(url, "foo", "bar", successCallback, errorCallback);
     }
 };
 
